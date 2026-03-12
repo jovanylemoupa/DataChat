@@ -13,7 +13,7 @@ __pycache__/
 dist/
 build/
 *.egg
-.venv/
+backend/.venv/
 venv/
 env/
 .pytest_cache/
