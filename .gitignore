@@ -1,0 +1,58 @@
+# ── ENVIRONNEMENT ─────────────────────────────────────────
+.env
+*.env.local
+*.env.production
+
+# ── PYTHON ────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# ── DJANGO ────────────────────────────────────────────────
+backend/media/
+backend/staticfiles/
+backend/*.sqlite3
+backend/db.sqlite3
+
+# ── NODE / ANGULAR ────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.sass-cache/
+*.js.map
+
+# ── DOCKER ────────────────────────────────────────────────
+.docker/
+
+# ── IDE ───────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ── LOGS ──────────────────────────────────────────────────
+*.log
+logs/
+
+# ── CHROMA ────────────────────────────────────────────────
+backend/chroma_data/
+
+# ── OLLAMA ────────────────────────────────────────────────
+ollama_data/

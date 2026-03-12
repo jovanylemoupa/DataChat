@@ -1,0 +1,144 @@
+version: "3.9"
+
+services:
+
+  # ── FRONTEND ──────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: datachat_frontend
+    ports:
+      - "4201:4200"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    networks:
+      - datachat_network
+
+  # ── BACKEND ───────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: datachat_backend
+    ports:
+      - "8002:8000"
+    volumes:
+      - ./backend:/app
+      - media_data:/app/media
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.dev
+    depends_on:
+      - postgres
+      - redis
+      - chromadb
+    networks:
+      - datachat_network
+    command: uvicorn config.asgi:application --host 0.0.0.0 --port 8000 --reload
+
+  # ── CELERY WORKER ─────────────────────────────────────────
+  celery:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: datachat_celery
+    volumes:
+      - ./backend:/app
+      - media_data:/app/media
+    env_file:
+      - .env
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.dev
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - datachat_network
+    command: celery -A tasks.celery worker --loglevel=info
+
+  # ── KEYCLOAK ──────────────────────────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: datachat_keycloak
+    ports:
+      - "8081:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak_db
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./infra/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+    depends_on:
+      - postgres
+    networks:
+      - datachat_network
+    command: start-dev --import-realm
+
+  # ── POSTGRESQL ────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: datachat_postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - datachat_network
+
+  # ── REDIS ─────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: datachat_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - datachat_network
+
+  # ── CHROMADB ──────────────────────────────────────────────
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: datachat_chromadb
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    networks:
+      - datachat_network
+
+  # ── OLLAMA ────────────────────────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    container_name: datachat_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - datachat_network
+
+volumes:
+  postgres_data:
+  redis_data:
+  chroma_data:
+  ollama_data:
+  media_data:
+
+networks:
+  datachat_network:
+    driver: bridge
