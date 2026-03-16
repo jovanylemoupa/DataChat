@@ -22,6 +22,7 @@ class UploadResourceUseCase:
         resource = Resource(
             id=None,
             user_id=dto.user_id,
+            user_email=dto.user_email,
             name=dto.name,
             resource_type=resource_type,
             file_path=dto.file_path,

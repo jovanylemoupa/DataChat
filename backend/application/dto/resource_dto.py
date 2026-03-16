@@ -10,6 +10,7 @@ class ResourceUploadDTO:
     file_path: str
     size_bytes: int
     user_id: str
+    user_email: str = ""
 
 
 @dataclass

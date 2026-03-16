@@ -24,4 +24,12 @@ def get_llm() -> BaseChatModel:
             temperature=0.1,
         )
 
+    if provider == "groq":
+        from langchain_groq import ChatGroq
+        return ChatGroq(
+            model=settings.GROQ_MODEL,
+            api_key=settings.GROQ_API_KEY,
+            temperature=0.1,
+        )
+
     raise ValueError(f"LLM_PROVIDER inconnu : {provider}")

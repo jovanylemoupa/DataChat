@@ -14,3 +14,4 @@ class Resource:
     status: AnalysisStatus
     size_bytes: int
     created_at: datetime | None = None
+    user_email: str = ""
