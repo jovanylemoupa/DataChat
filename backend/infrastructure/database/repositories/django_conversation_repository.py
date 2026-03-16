@@ -1,15 +1,17 @@
 from domain.models.conversation import Conversation
 from domain.repositories.conversation_repository import ConversationRepository
 from infrastructure.database.models import Conversation as ConversationModel
+from infrastructure.database.models.user_model import UserProfile
 
 
 class DjangoConversationRepository(ConversationRepository):
 
     def save(self, conversation: Conversation) -> Conversation:
+        user = UserProfile.objects.get(keycloak_id=conversation.user_id)
         obj, _ = ConversationModel.objects.update_or_create(
             id=conversation.id if conversation.id else None,
             defaults={
-                "user_id": conversation.user_id,
+                "user": user,
                 "resource_id": conversation.resource_id,
                 "title": conversation.title,
             }

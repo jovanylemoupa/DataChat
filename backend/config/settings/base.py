@@ -66,9 +66,7 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [],
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
-    ],
+    "DEFAULT_PERMISSION_CLASSES": [],
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
     ],
@@ -98,6 +96,8 @@ CHROMA_PORT = config("CHROMA_PORT", default=8000, cast=int)
 LLM_PROVIDER = config("LLM_PROVIDER", default="ollama")
 OLLAMA_BASE_URL = config("OLLAMA_BASE_URL", default="http://ollama:11434")
 OLLAMA_MODEL = config("OLLAMA_MODEL", default="mistral")
+GROQ_API_KEY = config("GROQ_API_KEY", default="")
+GROQ_MODEL = config("GROQ_MODEL", default="llama-3.1-8b-instant")
 
 LANGUAGE_CODE = "fr-fr"
 TIME_ZONE = "Europe/Paris"

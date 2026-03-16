@@ -121,22 +121,10 @@ services:
     networks:
       - datachat_network
 
-  # ── OLLAMA ────────────────────────────────────────────────
-  ollama:
-    image: ollama/ollama:latest
-    container_name: datachat_ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    networks:
-      - datachat_network
-
 volumes:
   postgres_data:
   redis_data:
   chroma_data:
-  ollama_data:
   media_data:
 
 networks:

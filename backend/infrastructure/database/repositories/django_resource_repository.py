@@ -3,15 +3,24 @@ from domain.repositories.resource_repository import ResourceRepository
 from domain.entities.resource_type import ResourceType
 from domain.entities.analysis_status import AnalysisStatus
 from infrastructure.database.models import Resource as ResourceModel
+from infrastructure.database.models.user_model import UserProfile
 
 
 class DjangoResourceRepository(ResourceRepository):
 
+    def _get_or_create_user(self, keycloak_id: str, email: str) -> UserProfile:
+        profile, _ = UserProfile.objects.get_or_create(
+            keycloak_id=keycloak_id,
+            defaults={"email": email, "username": email.split("@")[0]},
+        )
+        return profile
+
     def save(self, resource: Resource) -> Resource:
+        user = self._get_or_create_user(resource.user_id, resource.user_email)
         obj, _ = ResourceModel.objects.update_or_create(
             id=resource.id if resource.id else None,
             defaults={
-                "user_id": resource.user_id,
+                "user": user,
                 "name": resource.name,
                 "resource_type": resource.resource_type.value,
                 "file_path": resource.file_path,
